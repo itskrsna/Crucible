@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-label="Crucible pipeline: ingest, claims, sandbox agent, measure, record, registry">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="400" rx="18" fill="#f8fafc" stroke="#d6dee9"/>
+  <g font-family="Segoe UI, system-ui, -apple-system, sans-serif" text-anchor="middle">
+    <text x="600" y="48" font-size="26" font-weight="700" fill="#0f172a">How Crucible checks a paper</text>
+
+    <g>
+      <rect x="30" y="86" width="168" height="150" rx="14" fill="#e0ecff" stroke="#9db8e8"/>
+      <text x="114" y="122" font-size="30">📄</text>
+      <text x="114" y="158" font-size="19" font-weight="700" fill="#0f172a">1 · Ingest</text>
+      <text x="114" y="184" font-size="14" fill="#334155">paper LaTeX from arXiv,</text>
+      <text x="114" y="204" font-size="14" fill="#334155">repo and pinned commit</text>
+    </g>
+    <g>
+      <rect x="226" y="86" width="168" height="150" rx="14" fill="#e0ecff" stroke="#9db8e8"/>
+      <text x="310" y="122" font-size="30">🎯</text>
+      <text x="310" y="158" font-size="19" font-weight="700" fill="#0f172a">2 · Claims</text>
+      <text x="310" y="184" font-size="14" fill="#334155">headline numbers pulled</text>
+      <text x="310" y="204" font-size="14" fill="#334155">from the paper's tables</text>
+    </g>
+    <g>
+      <rect x="422" y="86" width="168" height="150" rx="14" fill="#ffe9d6" stroke="#f0b98a"/>
+      <text x="506" y="122" font-size="30">🔒</text>
+      <text x="506" y="158" font-size="19" font-weight="700" fill="#0f172a">3 · Sandbox</text>
+      <text x="506" y="184" font-size="14" fill="#334155">AI agent builds the env in</text>
+      <text x="506" y="204" font-size="14" fill="#334155">a locked-down container</text>
+    </g>
+    <g>
+      <rect x="618" y="86" width="168" height="150" rx="14" fill="#ffe9d6" stroke="#f0b98a"/>
+      <text x="702" y="122" font-size="30">📏</text>
+      <text x="702" y="158" font-size="19" font-weight="700" fill="#0f172a">4 · Measure</text>
+      <text x="702" y="184" font-size="14" fill="#334155">the harness re-runs the</text>
+      <text x="702" y="204" font-size="14" fill="#334155">command, reads the number</text>
+    </g>
+    <g>
+      <rect x="814" y="86" width="168" height="150" rx="14" fill="#dff5e6" stroke="#8fd1a4"/>
+      <text x="898" y="122" font-size="30">🧾</text>
+      <text x="898" y="158" font-size="19" font-weight="700" fill="#0f172a">5 · Record</text>
+      <text x="898" y="184" font-size="14" fill="#334155">verdict, commands, Dockerfile</text>
+      <text x="898" y="204" font-size="14" fill="#334155">and the full transcript</text>
+    </g>
+    <g>
+      <rect x="1010" y="86" width="168" height="150" rx="14" fill="#dff5e6" stroke="#8fd1a4"/>
+      <text x="1094" y="122" font-size="30">🏷️</text>
+      <text x="1094" y="158" font-size="19" font-weight="700" fill="#0f172a">6 · Registry</text>
+      <text x="1094" y="184" font-size="14" fill="#334155">a public page and a</text>
+      <text x="1094" y="204" font-size="14" fill="#334155">badge for the README</text>
+    </g>
+
+    <g stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)">
+      <line x1="200" y1="161" x2="222" y2="161"/>
+      <line x1="396" y1="161" x2="418" y2="161"/>
+      <line x1="592" y1="161" x2="614" y2="161"/>
+      <line x1="788" y1="161" x2="810" y2="161"/>
+      <line x1="984" y1="161" x2="1006" y2="161"/>
+    </g>
+
+    <rect x="30" y="262" width="1148" height="58" rx="12" fill="#fff7e8" stroke="#f0d49a"/>
+    <text x="604" y="288" font-size="17" font-weight="700" fill="#7a4b00">The model never reports numbers.</text>
+    <text x="604" y="310" font-size="15" fill="#7a4b00">It proposes commands. Crucible runs them itself, rejects any command that hard-codes its answer, and extracts the value with a regex.</text>
+
+    <text x="604" y="356" font-size="15" fill="#475569">Anyone can replay a record with <tspan font-family="Consolas, monospace" font-weight="700" fill="#0f172a">crucible rerun</tspan>: no AI model needed, just Docker.</text>
+  </g>
+</svg>

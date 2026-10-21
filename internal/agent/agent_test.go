@@ -56,6 +56,117 @@ func TestRunMeasuresNumbersItself(t *testing.T) {
 	}
 }
 
+type echoExec struct{ fakeExec }
+
+// Exec behaves like a shell: `echo` prints its argument, eval.py computes 0.381.
+func (e *echoExec) Exec(ctx context.Context, cmd string, t time.Duration) (sandbox.Result, error) {
+	if strings.HasPrefix(cmd, "echo ") {
+		return sandbox.Result{Output: strings.TrimPrefix(cmd, "echo ") + "\n"}, nil
+	}
+	return e.fakeExec.Exec(ctx, cmd, t)
+}
+
+func TestHardCodedNumberIsRejectedThenRetried(t *testing.T) {
+	ch := &scripted{replies: []string{
+		`{"done":true,"runs":[{"claim_id":"c1","command":"echo mse: 0.381","pattern":"mse:\\s*([0-9.]+)"}]}`,
+		`{"done":true,"runs":[{"claim_id":"c1","command":"cd /work/repo && python eval.py","pattern":"mse:\\s*([0-9.]+)"}]}`,
+	}}
+	out, err := Run(context.Background(), ch, &echoExec{}, "img", schemas.Paper{}, claims, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := out.Measurements[0]
+	if m.Value == nil || *m.Value != 0.381 || !strings.Contains(m.Command, "eval.py") {
+		t.Fatalf("expected the computed measurement to win, got %+v", m)
+	}
+	if ch.i != 2 {
+		t.Errorf("agent should have been asked again exactly once, calls=%d", ch.i)
+	}
+}
+
+func TestHardCodedNumberFailsAfterRepeatedRejections(t *testing.T) {
+	echo := `{"done":true,"runs":[{"claim_id":"c1","command":"echo mse: 0.381","pattern":"mse:\\s*([0-9.]+)"}]}`
+	ch := &scripted{replies: []string{echo, echo, echo}}
+	out, err := Run(context.Background(), ch, &echoExec{}, "img", schemas.Paper{}, claims, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := out.Measurements[0]
+	if m.Value != nil || !strings.Contains(m.Note, "hard-coded") {
+		t.Fatalf("a hard-coded number must never become a measurement: %+v", m)
+	}
+}
+
+func TestCompactHistoryShrinksOnlyOldOutputs(t *testing.T) {
+	long := strings.Repeat("x", 3000)
+	msgs := []llm.Message{{Role: "system", Content: long}, {Role: "user", Content: long}}
+	for i := 0; i < 10; i++ {
+		msgs = append(msgs, llm.Message{Role: "assistant", Content: "a"}, llm.Message{Role: "user", Content: long})
+	}
+	got := compactHistory(msgs)
+	if len(got[0].Content) != 3000 || len(got[1].Content) != 3000 {
+		t.Error("system prompt and task description must stay intact")
+	}
+	if len(got[3].Content) >= 3000 {
+		t.Error("an old command output should be shortened")
+	}
+	if len(got[len(got)-1].Content) != 3000 {
+		t.Error("the newest messages must stay intact")
+	}
+	if len(msgs[3].Content) != 3000 {
+		t.Error("the original history must not be modified")
+	}
+}
+
+// recording captures what the model is shown on each call.
+type recording struct {
+	scripted
+	seen [][]llm.Message
+}
+
+func (r *recording) Chat(ctx context.Context, msgs []llm.Message, j bool) (string, error) {
+	r.seen = append(r.seen, append([]llm.Message{}, msgs...))
+	return r.scripted.Chat(ctx, msgs, j)
+}
+
+func TestAgentIsToldToWrapUpBeforeBudgetEnds(t *testing.T) {
+	var replies []string
+	for i := 0; i < 8; i++ {
+		replies = append(replies, `{"command":"echo exploring"}`)
+	}
+	ch := &recording{scripted: scripted{replies: replies}}
+	if _, err := Run(context.Background(), ch, &fakeExec{}, "img", schemas.Paper{}, claims, Config{MaxSteps: 8}); err != nil {
+		t.Fatal(err)
+	}
+	notice := func(call int) bool {
+		last := ch.seen[call][len(ch.seen[call])-1]
+		return last.Role == "user" && strings.Contains(last.Content, "steps remain")
+	}
+	if notice(3) {
+		t.Error("too early: no notice expected 5 steps before the end")
+	}
+	if !notice(4) {
+		t.Error("the agent should be told to wrap up with 4 steps left")
+	}
+	for i := 1; i < len(ch.seen[7]); i++ {
+		if ch.seen[7][i].Role == ch.seen[7][i-1].Role && ch.seen[7][i].Role != "system" {
+			t.Fatalf("roles must alternate, got two %q in a row at %d", ch.seen[7][i].Role, i)
+		}
+	}
+}
+
+func TestHardCoded(t *testing.T) {
+	if !hardCoded(`echo "MSE = 0.3611617"`, "0.3611617") {
+		t.Error("literal number in command should be flagged")
+	}
+	if hardCoded("python run.py --seq_len 96", "96") {
+		t.Error("short numbers collide with flags and must be ignored")
+	}
+	if hardCoded("python eval.py", "0.381") {
+		t.Error("computed number is fine")
+	}
+}
+
 func TestGiveUpMarksClaimsCouldNotRun(t *testing.T) {
 	ch := &scripted{replies: []string{`{"give_up":true,"reason":"missing_data"}`}}
 	out, err := Run(context.Background(), ch, &fakeExec{}, "img", schemas.Paper{}, claims, Config{})

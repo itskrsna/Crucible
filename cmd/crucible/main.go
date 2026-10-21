@@ -29,7 +29,8 @@ Usage:
   crucible discover [--limit N] [--since YYYY-MM-DD] [--triage] [--deep] [--out candidates.json]
   crucible run <arxiv_id>                  attempt one paper, write records/<id>/
   crucible batch --candidates FILE         run many papers (resumable; skips existing records)
-  crucible rerun <arxiv_id>                rebuild the recorded Dockerfile and re-run, no LLM
+  crucible base                         build the sandbox base image (also done automatically on first use)
+  crucible rerun <arxiv_id>              rebuild the recorded Dockerfile and re-run, no LLM
   crucible review <arxiv_id> --approve     mark a record as human-reviewed so it can be published
   crucible site [--out public]             generate the static registry and badges
   crucible eval --tasks FILE               measure agent accuracy on tasks with known answers
@@ -59,7 +60,7 @@ func addCommon(fs *flag.FlagSet) *common {
 	fs.StringVar(&c.model, "model", env("CRUCIBLE_MODEL", "llama3.1:8b"), "model name")
 	fs.StringVar(&c.apiKey, "api-key", os.Getenv("CRUCIBLE_API_KEY"), "API key (prefer the env var)")
 	fs.StringVar(&c.cache, "cache", ".cache/llm", "LLM response cache directory")
-	fs.StringVar(&c.image, "image", "python:3.11", "sandbox base image (needs git and a compiler; apt is unavailable inside)")
+	fs.StringVar(&c.image, "image", sandbox.BaseImage, "sandbox image (the default is built automatically on first use)")
 	fs.StringVar(&c.records, "records", "records", "records directory")
 	fs.IntVar(&c.maxSteps, "max-steps", 40, "agent step budget")
 	fs.IntVar(&c.cpus, "cpus", 4, "sandbox CPU limit")
@@ -75,7 +76,19 @@ func (c *common) agentCfg() agent.Config {
 	return agent.Config{MaxSteps: c.maxSteps, StepTimeout: c.stepTimeout, RunTimeout: c.runTimeout}
 }
 
+// ensureImage builds the default base image on first use. Custom images are
+// the user's responsibility.
+func (c *common) ensureImage(ctx context.Context) error {
+	if c.image != sandbox.BaseImage {
+		return nil
+	}
+	return sandbox.EnsureBase(ctx, logf)
+}
+
 func (c *common) newSandbox(ctx context.Context) (sandbox.Executor, error) {
+	if err := c.ensureImage(ctx); err != nil {
+		return nil, err
+	}
 	return sandbox.Start(ctx, sandbox.Options{Image: c.image, CPUs: float64(c.cpus), MemoryGB: c.memGB})
 }
 
@@ -182,6 +195,11 @@ func main() {
 		cmdBatch(ctx, args)
 	case "rerun":
 		cmdRerun(ctx, args)
+	case "base":
+		if err := sandbox.EnsureBase(ctx, logf); err != nil {
+			fatal(err)
+		}
+		logf("base image %s is ready", sandbox.BaseImage)
 	case "review":
 		cmdReview(args)
 	case "site":
@@ -317,6 +335,9 @@ func cmdRerun(ctx context.Context, args []string) {
 	id := fs.Arg(0)
 	rec, err := record.Load(filepath.Join(record.Dir(c.records, id), "record.json"))
 	if err != nil {
+		fatal(err)
+	}
+	if err := sandbox.EnsureBase(ctx, logf); err != nil {
 		fatal(err)
 	}
 	results, err := pipeline.Rerun(ctx, rec, "crucible-rerun-"+record.Slug(id),

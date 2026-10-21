@@ -63,7 +63,11 @@ func Start(ctx context.Context, o Options) (*Docker, error) {
 		return nil, err
 	}
 	name := "crucible-" + hex.EncodeToString(id[:])
-	out, err := run(ctx, "", "run", "-d", "--name", name,
+	args := []string{"run", "-d", "--name", name}
+	for _, e := range pipEnv {
+		args = append(args, "-e", e)
+	}
+	args = append(args,
 		"--cpus", fmt.Sprint(o.CPUs),
 		"--memory", fmt.Sprintf("%dg", o.MemoryGB),
 		"--pids-limit", "1024",
@@ -71,6 +75,7 @@ func Start(ctx context.Context, o Options) (*Docker, error) {
 		"--security-opt", "no-new-privileges",
 		"--workdir", "/work",
 		o.Image, "sleep", "infinity")
+	out, err := run(ctx, "", args...)
 	if err != nil {
 		return nil, fmt.Errorf("sandbox: start container: %w: %s", err, strings.TrimSpace(out))
 	}

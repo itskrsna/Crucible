@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func TestChatCachesResponses(t *testing.T) {
@@ -46,6 +47,44 @@ func TestChatRetriesServerErrors(t *testing.T) {
 	got, err := c.Chat(context.Background(), []Message{{Role: "user", Content: "x"}}, false)
 	if err != nil || got != "ok" {
 		t.Fatalf("got %q, %v", got, err)
+	}
+}
+
+func TestChatWaitsOutRateLimits(t *testing.T) {
+	var hits atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hits.Add(1) < 3 {
+			w.Header().Set("Retry-After", "0")
+			http.Error(w, "slow down", http.StatusTooManyRequests)
+			return
+		}
+		fmt.Fprint(w, `{"choices":[{"message":{"content":"finally"}}]}`)
+	}))
+	defer srv.Close()
+
+	c := New(srv.URL, "", "m", "")
+	c.retryDelay = time.Millisecond
+	got, err := c.Chat(context.Background(), []Message{{Role: "user", Content: "x"}}, false)
+	if err != nil || got != "finally" || hits.Load() != 3 {
+		t.Fatalf("got %q err=%v hits=%d", got, err, hits.Load())
+	}
+}
+
+func TestChatRetriesEmptyReplies(t *testing.T) {
+	var hits atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hits.Add(1) == 1 {
+			fmt.Fprint(w, `{"choices":[{"message":{"content":""}}]}`)
+			return
+		}
+		fmt.Fprint(w, `{"choices":[{"message":{"content":"answer"}}]}`)
+	}))
+	defer srv.Close()
+
+	c := New(srv.URL, "", "m", "")
+	c.retryDelay = time.Millisecond
+	if got, err := c.Chat(context.Background(), []Message{{Role: "user", Content: "x"}}, false); err != nil || got != "answer" {
+		t.Fatalf("got %q err=%v", got, err)
 	}
 }
 

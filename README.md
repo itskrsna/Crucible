@@ -1,4 +1,13 @@
-# crucible
+<p align="center">
+  <img src="docs/hero.svg" alt="Crucible: put published results to the test" width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
+  <img alt="Go 1.22+" src="https://img.shields.io/badge/go-1.22%2B-00ADD8">
+  <img alt="Open models only" src="https://img.shields.io/badge/models-open%20source%20only-2e9d4e">
+  <img alt="Status: early" src="https://img.shields.io/badge/status-early-orange">
+</p>
 
 An open-source agent that tries to reproduce the headline results of published computational papers
 inside a sandbox, and publishes an open, **rerunnable** reproducibility record for each attempt.
@@ -11,9 +20,9 @@ almost nobody does. `crucible` makes a first check cheap, and makes the evidence
 
 ## How it works
 
-```
-arXiv id → ingest → claims → sandbox + agent → compare → record → registry
-```
+<p align="center">
+  <img src="docs/pipeline.svg" alt="Pipeline: ingest, claims, sandbox, measure, record, registry" width="100%">
+</p>
 
 1. **ingest** – fetches the paper's LaTeX from arXiv, finds the GitHub repo, pins the commit.
 2. **claims** – an LLM pulls out the headline numbers from the paper's tables (and the best baseline the
@@ -24,8 +33,28 @@ arXiv id → ingest → claims → sandbox + agent → compare → record → re
    extracts values with a regex, so results can't be hallucinated. Verdicts: `reproduced`, `partial`,
    `not_reproduced`, `could_not_run` (with a reason).
 5. **record** – verdicts, the exact commands, a Dockerfile and the agent transcript. `crucible rerun` replays
-   the record with **no LLM at all**.
+   the record with **no LLM at all**. (A record is only replayable if the agent marked every step that
+   its measurement depends on, such as training, as a setup step. Records made before that rule was added
+   may not be, so check that `crucible rerun` reproduces a record before relying on it.)
 6. **registry** – a static site with a page and a README badge per paper.
+
+## Badges for papers
+
+Every paper Crucible checks gets a status badge that links to its public record. Authors can paste one
+into their README so readers can see, and replay, the evidence:
+
+| Verdict | Badge |
+|---|---|
+| every claim matched | <img src="docs/badges/reproduced.svg" alt="reproduced"> |
+| some matched, some close or not run | <img src="docs/badges/partial.svg" alt="partially reproduced"> |
+| a claim did not match | <img src="docs/badges/not-reproduced.svg" alt="not reproduced"> |
+| nothing could be run | <img src="docs/badges/could-not-run.svg" alt="could not run"> |
+
+```md
+[![crucible](https://itskrsna.github.io/Crucible/badges/<arxiv-id>.svg)](https://itskrsna.github.io/Crucible/<arxiv-id>.html)
+```
+
+*(These badges are produced by Crucible's own code. The registry that serves them is not published yet.)*
 
 ## Quick start
 

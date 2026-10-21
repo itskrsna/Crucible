@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -65,15 +66,15 @@ func (c *Client) Chat(ctx context.Context, msgs []Message, jsonMode bool) (strin
 	}
 
 	var lastErr error
-	for attempt := 1; attempt <= 3; attempt++ {
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		// Small models sometimes fall into repetition loops that the server
 		// aborts with a 500. Retrying the identical deterministic request would
 		// loop again, so nudge the temperature up on each retry.
 		body := map[string]any{
 			"model":       c.Model,
 			"messages":    msgs,
-			"temperature": 0.3 * float64(attempt-1),
-			"max_tokens":  2048,
+			"temperature": 0.3 * float64(min(attempt-1, 2)),
+			"max_tokens":  maxTokens,
 			"stream":      false,
 		}
 		if jsonMode {
@@ -83,7 +84,7 @@ func (c *Client) Chat(ctx context.Context, msgs []Message, jsonMode bool) (strin
 		if err != nil {
 			return "", err
 		}
-		reply, retry, err := c.once(ctx, payload)
+		reply, retry, wait, err := c.once(ctx, payload)
 		if err == nil {
 			c.store(msgs, jsonMode, reply)
 			return reply, nil
@@ -92,19 +93,35 @@ func (c *Client) Chat(ctx context.Context, msgs []Message, jsonMode bool) (strin
 		if !retry {
 			break
 		}
+		if wait == 0 {
+			wait = c.retryDelay * time.Duration(attempt)
+		}
 		select {
 		case <-ctx.Done():
 			return "", ctx.Err()
-		case <-time.After(c.retryDelay * time.Duration(attempt)):
+		case <-time.After(wait):
 		}
 	}
 	return "", lastErr
 }
 
-func (c *Client) once(ctx context.Context, payload []byte) (reply string, retry bool, err error) {
+const (
+	maxAttempts = 6
+	// Reasoning models spend output tokens on thinking before the answer, so
+	// the cap must leave room for both.
+	maxTokens = 8192
+	// Free tiers are rate-limited per minute; wait this long if the server
+	// doesn't say when to retry.
+	defaultRateLimitWait = 20 * time.Second
+	maxRateLimitWait     = 90 * time.Second
+)
+
+// once makes a single request. retry says whether trying again may help, and
+// wait is how long the server asked us to hold off (zero if it didn't).
+func (c *Client) once(ctx context.Context, payload []byte) (reply string, retry bool, wait time.Duration, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/chat/completions", bytes.NewReader(payload))
 	if err != nil {
-		return "", false, err
+		return "", false, 0, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	if c.APIKey != "" {
@@ -112,16 +129,19 @@ func (c *Client) once(ctx context.Context, payload []byte) (reply string, retry 
 	}
 	resp, err := c.HTTP.Do(req)
 	if err != nil {
-		return "", true, err
+		return "", true, 0, err
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(io.LimitReader(resp.Body, 16<<20))
 	if err != nil {
-		return "", true, err
+		return "", true, 0, err
 	}
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusTooManyRequests {
+			wait = rateLimitWait(resp.Header.Get("Retry-After"), c.retryDelay)
+		}
 		retry = resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500
-		return "", retry, fmt.Errorf("llm: %s: %s", resp.Status, snippet(data))
+		return "", retry, wait, fmt.Errorf("llm: %s: %s", resp.Status, snippet(data))
 	}
 	var out struct {
 		Choices []struct {
@@ -129,9 +149,27 @@ func (c *Client) once(ctx context.Context, payload []byte) (reply string, retry 
 		} `json:"choices"`
 	}
 	if err := json.Unmarshal(data, &out); err != nil || len(out.Choices) == 0 {
-		return "", false, fmt.Errorf("llm: unexpected response: %s", snippet(data))
+		return "", false, 0, fmt.Errorf("llm: unexpected response: %s", snippet(data))
 	}
-	return out.Choices[0].Message.Content, false, nil
+	content := out.Choices[0].Message.Content
+	if strings.TrimSpace(content) == "" {
+		// Usually the model ran out of tokens while thinking, or the provider hiccuped.
+		return "", true, 0, fmt.Errorf("llm: empty reply")
+	}
+	return content, false, 0, nil
+}
+
+// rateLimitWait honours a Retry-After header in seconds, within sane bounds.
+// With no usable header it waits defaultRateLimitWait, unless retries are
+// disabled for tests (base == 0).
+func rateLimitWait(header string, base time.Duration) time.Duration {
+	if base == 0 {
+		return 0
+	}
+	if s, err := strconv.Atoi(strings.TrimSpace(header)); err == nil && s >= 0 {
+		return min(time.Duration(s)*time.Second, maxRateLimitWait)
+	}
+	return defaultRateLimitWait
 }
 
 func (c *Client) store(msgs []Message, jsonMode bool, reply string) {
