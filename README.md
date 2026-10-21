@@ -40,8 +40,8 @@ almost nobody does. `crucible` makes a first check cheap, and makes the evidence
 
 ## What a published record looks like
 
-This is a real record: [Crucible's first attempt](records/2610.25392/record.json) on a paper from arXiv
-(2610.25392). It re-ran the paper's own code on CPU and compared four of its reported numbers.
+This is a real record: [Crucible's first attempt](https://itskrsna.github.io/Crucible/2610.25392.html)
+([raw record](records/2610.25392/record.json)) on a paper from arXiv (2610.25392). It re-ran the paper's own code on CPU and compared four of its reported numbers.
 
 <p align="center">
   <img src="docs/registry-record.png" alt="Crucible registry page for arXiv 2610.25392 showing four claims, measured values, limitations, and a not-replay-verified notice" width="720">
@@ -67,7 +67,8 @@ into their README so readers can see, and replay, the evidence:
 [![crucible](https://itskrsna.github.io/Crucible/badges/<arxiv-id>.svg)](https://itskrsna.github.io/Crucible/<arxiv-id>.html)
 ```
 
-*(These badges are produced by Crucible's own code. The registry that serves them is not published yet.)*
+These badges are produced by Crucible's own code. The live registry, with the first record, is at
+**https://itskrsna.github.io/Crucible/**.
 
 ## Quick start
 
