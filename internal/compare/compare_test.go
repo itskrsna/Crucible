@@ -3,7 +3,7 @@ package compare
 import (
 	"testing"
 
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 var claim = schemas.Claim{ID: "c1", Metric: "MSE", Dataset: "ETTh1", Setting: "H=96", Value: 0.380, Source: "Table 2"}

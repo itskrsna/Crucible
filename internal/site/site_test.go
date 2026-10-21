@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/itskrsna/crucible/internal/record"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/record"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 func yes() *bool { b := true; return &b }

@@ -3,8 +3,8 @@ package eval
 import (
 	"testing"
 
-	"github.com/itskrsna/crucible/internal/agent"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/agent"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 func f(v float64) *float64 { return &v }

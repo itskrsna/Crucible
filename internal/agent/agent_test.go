@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/itskrsna/crucible/internal/llm"
-	"github.com/itskrsna/crucible/internal/sandbox"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/sandbox"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 type scripted struct {

@@ -9,17 +9,18 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/itskrsna/crucible/internal/agent"
-	"github.com/itskrsna/crucible/internal/discover"
-	"github.com/itskrsna/crucible/internal/eval"
-	"github.com/itskrsna/crucible/internal/llm"
-	"github.com/itskrsna/crucible/internal/pipeline"
-	"github.com/itskrsna/crucible/internal/record"
-	"github.com/itskrsna/crucible/internal/sandbox"
-	"github.com/itskrsna/crucible/internal/site"
+	"github.com/itskrsna/Crucible/internal/agent"
+	"github.com/itskrsna/Crucible/internal/discover"
+	"github.com/itskrsna/Crucible/internal/eval"
+	"github.com/itskrsna/Crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/pipeline"
+	"github.com/itskrsna/Crucible/internal/record"
+	"github.com/itskrsna/Crucible/internal/sandbox"
+	"github.com/itskrsna/Crucible/internal/site"
 )
 
 const usage = `crucible: check whether published computational results reproduce.
@@ -142,7 +143,28 @@ func isBool(f *flag.Flag) bool {
 	return ok && b.IsBoolFlag()
 }
 
+// loadDotEnv sets variables from a KEY=VALUE file without overriding ones
+// already in the environment. A missing file is fine.
+func loadDotEnv(path string) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		line = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), "export "))
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		k, v, ok := strings.Cut(line, "=")
+		k, v = strings.TrimSpace(k), strings.Trim(strings.TrimSpace(v), `"'`)
+		if ok && k != "" && os.Getenv(k) == "" {
+			os.Setenv(k, v)
+		}
+	}
+}
+
 func main() {
+	loadDotEnv(".env")
 	if len(os.Args) < 2 {
 		fmt.Fprint(os.Stderr, usage)
 		os.Exit(2)

@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/itskrsna/crucible/internal/arxiv"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/arxiv"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 var githubRepo = regexp.MustCompile(`https?://(?:www\.)?github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)`)

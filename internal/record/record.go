@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 // Slug makes an arXiv id safe for file names (old-style ids contain "/").

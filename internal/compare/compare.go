@@ -6,7 +6,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 // Relative tolerances: within Strict is reproduced, within Loose is partial.

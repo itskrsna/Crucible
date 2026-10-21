@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/itskrsna/crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/llm"
 )
 
 type fakeLLM struct{ reply string }

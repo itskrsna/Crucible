@@ -10,10 +10,10 @@ import (
 	"math"
 	"os"
 
-	"github.com/itskrsna/crucible/internal/agent"
-	"github.com/itskrsna/crucible/internal/llm"
-	"github.com/itskrsna/crucible/internal/sandbox"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/agent"
+	"github.com/itskrsna/Crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/sandbox"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 // Task is one problem with a known answer. Claim.Value holds the ground truth.

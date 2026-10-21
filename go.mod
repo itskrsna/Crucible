@@ -1,3 +1,3 @@
-module github.com/itskrsna/crucible
+module github.com/itskrsna/Crucible
 
 go 1.27.1

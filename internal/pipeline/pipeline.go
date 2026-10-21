@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/itskrsna/crucible/internal/agent"
-	"github.com/itskrsna/crucible/internal/claims"
-	"github.com/itskrsna/crucible/internal/compare"
-	"github.com/itskrsna/crucible/internal/ingest"
-	"github.com/itskrsna/crucible/internal/llm"
-	"github.com/itskrsna/crucible/internal/sandbox"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/agent"
+	"github.com/itskrsna/Crucible/internal/claims"
+	"github.com/itskrsna/Crucible/internal/compare"
+	"github.com/itskrsna/Crucible/internal/ingest"
+	"github.com/itskrsna/Crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/sandbox"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 type Deps struct {

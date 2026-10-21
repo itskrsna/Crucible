@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/itskrsna/crucible/internal/arxiv"
-	"github.com/itskrsna/crucible/internal/ingest"
-	"github.com/itskrsna/crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/arxiv"
+	"github.com/itskrsna/Crucible/internal/ingest"
+	"github.com/itskrsna/Crucible/internal/llm"
 )
 
 // Benchmarks are the small, standard long-term-forecasting datasets that fit a CPU.

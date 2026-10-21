@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/itskrsna/crucible/internal/record"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/record"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 // ProjectURL is where disputes and corrections are filed.
-const ProjectURL = "https://github.com/itskrsna/crucible"
+const ProjectURL = "https://github.com/itskrsna/Crucible"
 
 type Stats struct {
 	Total, Reproduced, Partial, NotReproduced, CouldNotRun int

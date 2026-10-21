@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 func rec(verdicts ...schemas.Verdict) schemas.Record {

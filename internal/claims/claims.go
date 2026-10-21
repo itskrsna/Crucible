@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/itskrsna/crucible/internal/llm"
-	"github.com/itskrsna/crucible/internal/schemas"
+	"github.com/itskrsna/Crucible/internal/llm"
+	"github.com/itskrsna/Crucible/internal/schemas"
 )
 
 const (
