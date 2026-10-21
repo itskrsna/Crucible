@@ -47,6 +47,39 @@ func TestGeneratePublishesOnlyReviewedNegatives(t *testing.T) {
 	}
 }
 
+func TestPageShowsLimitationsAndDoesNotOverclaimReplay(t *testing.T) {
+	root, out := t.TempDir(), t.TempDir()
+	r := schemas.Record{
+		Paper:       schemas.Paper{ArxivID: "2501.00003", Title: "Limited"},
+		Results:     []schemas.ClaimResult{{Verdict: schemas.Reproduced}},
+		Limitations: []string{"single seed <only>"},
+	}
+	if err := record.Write(root, r, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Generate(root, out); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(filepath.Join(out, "2501.00003.html"))
+	page := string(b)
+	if !strings.Contains(page, "single seed &lt;only&gt;") {
+		t.Error("limitations must be listed and HTML-escaped")
+	}
+	if !strings.Contains(page, "Not replay-verified") || strings.Contains(page, "reproduced its measurements") {
+		t.Error("an unverified record must not claim it can be replayed")
+	}
+
+	r.ReplayVerified = true
+	if err := record.Write(root, r, nil); err != nil {
+		t.Fatal(err)
+	}
+	Generate(root, out)
+	b, _ = os.ReadFile(filepath.Join(out, "2501.00003.html"))
+	if !strings.Contains(string(b), "reproduced its measurements") || strings.Contains(string(b), "Not replay-verified") {
+		t.Error("a verified record should say so")
+	}
+}
+
 func TestBadgeEscapesText(t *testing.T) {
 	if svg := Badge(`<x>`); strings.Contains(svg, "<x>") {
 		t.Error("badge text must be escaped")

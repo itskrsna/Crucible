@@ -94,8 +94,8 @@ Every negative result is reviewed by a human before it is listed. Think a record
 <a href="%s/issues/new?title=%s">Open a dispute</a>.</p>`
 
 var indexTmpl = template.Must(template.New("index").Parse(`<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>crucible registry</title><style>` + css + `</style></head><body>
-<h1>crucible registry</h1><p class="muted">Open, rerunnable attempts to reproduce published results.</p>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Crucible registry</title><style>` + css + `</style></head><body>
+<h1>Crucible registry</h1><p class="muted">Open attempts to reproduce published results, each with its commands, limitations and full transcript.</p>
 <div class="stats">
 <div class="stat"><b>{{.Stats.Total}}</b>papers checked</div>
 <div class="stat"><b>{{.Stats.Reproduced}}</b>reproduced</div>
@@ -110,20 +110,33 @@ var indexTmpl = template.Must(template.New("index").Parse(`<!doctype html><html 
 <td><img src="badges/{{.Slug}}.svg" alt="{{.Overall}}"></td></tr>{{end}}
 </table>{{.Footer}}</body></html>`))
 
-var pageTmpl = template.Must(template.New("page").Parse(`<!doctype html><html lang="en"><head><meta charset="utf-8">
+// num rounds a measurement to 4 decimals; more digits would imply precision a
+// single CPU run doesn't have.
+func num(p *float64) string {
+	if p == nil {
+		return "—"
+	}
+	return fmt.Sprintf("%.4f", *p)
+}
+
+var pageTmpl = template.Must(template.New("page").Funcs(template.FuncMap{"num": num}).Parse(`<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{{.Rec.Paper.Title}} — crucible</title><style>` + css + `</style></head><body>
 <p><a href="index.html">← registry</a></p><h1>{{.Rec.Paper.Title}}</h1>
 <p class="muted">arXiv {{.Rec.Paper.ArxivID}} · <a href="{{.Rec.Paper.RepoURL}}">code</a>{{if .Rec.Paper.RepoCommit}} @ <code>{{.Rec.Paper.RepoCommit}}</code>{{end}} · model <code>{{.Rec.Model}}</code></p>
 <p><img src="badges/{{.Slug}}.svg" alt="{{.Overall}}"></p>
 <table><tr><th>Claim</th><th>Paper</th><th>Measured</th><th>Verdict</th></tr>
 {{range .Rec.Results}}<tr><td>{{.Claim.Metric}} · {{.Claim.Dataset}} {{.Claim.Setting}}<br><span class="muted">{{.Claim.Source}}</span></td>
-<td>{{.Claim.Value}}</td><td>{{if .Measured}}{{.Measured}}{{else}}—{{end}}</td>
+<td>{{.Claim.Value}}</td><td>{{num .Measured}}</td>
 <td>{{.Verdict}}{{if .Reason}} ({{.Reason}}){{end}}{{if .Note}}<br><span class="muted">{{.Note}}</span>{{end}}
 {{if .BeatsBaselines}}<br><span class="muted">still beats the paper's reported baselines</span>{{end}}</td></tr>{{end}}
 </table>
 {{if .Rec.HumanReviewed}}<p class="muted">Reviewed by a human.</p>{{end}}
-<h2>Rerun it</h2><p>The record includes a Dockerfile and the exact commands. No model is needed to rerun:</p>
-<pre>crucible rerun records/{{.Slug}}</pre>
+{{if .Rec.Limitations}}<h2>Limitations</h2><ul>{{range .Rec.Limitations}}<li>{{.}}</li>{{end}}</ul>{{end}}
+<h2>Replay</h2>
+{{if .Rec.ReplayVerified}}<p>This record was replayed from a fresh container and reproduced its measurements. No model is needed:</p>
+<pre>crucible rerun {{.Slug}}</pre>
+{{else}}<p class="note"><b>Not replay-verified.</b> The commands and Dockerfile are published for inspection, but this record has not yet been
+reproduced from a fresh container with <code>crucible rerun</code>, so treat the result as unconfirmed by replay.</p>{{end}}
 {{.Footer}}</body></html>`))
 
 // Generate writes the registry for all publishable records in recordsDir into outDir.

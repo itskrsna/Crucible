@@ -62,5 +62,11 @@ type Record struct {
 	Dockerfile    string        `json:"dockerfile,omitempty"`
 	Model         string        `json:"model,omitempty"`
 	Steps         int           `json:"steps,omitempty"`
-	HumanReviewed bool          `json:"human_reviewed"`
+	// Limitations are caveats a reader needs to interpret the verdicts, shown
+	// on the record's page. A green badge alone would overstate what was checked.
+	Limitations []string `json:"limitations,omitempty"`
+	// ReplayVerified is true only if `crucible rerun` was run on this record and
+	// reproduced its measurements from a fresh container.
+	ReplayVerified bool `json:"replay_verified"`
+	HumanReviewed  bool `json:"human_reviewed"`
 }
