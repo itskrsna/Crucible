@@ -38,6 +38,19 @@ almost nobody does. `crucible` makes a first check cheap, and makes the evidence
    may not be, so check that `crucible rerun` reproduces a record before relying on it.)
 6. **registry** – a static site with a page and a README badge per paper.
 
+## What a published record looks like
+
+This is a real record: [Crucible's first attempt](records/2610.25392/record.json) on a paper from arXiv
+(2610.25392). It re-ran the paper's own code on CPU and compared four of its reported numbers.
+
+<p align="center">
+  <img src="docs/registry-record.png" alt="Crucible registry page for arXiv 2610.25392 showing four claims, measured values, limitations, and a not-replay-verified notice" width="720">
+</p>
+
+Notice what the page says besides the green badge: the **scope** (four numbers, not the whole paper), the
+**limitations**, and that this record is **not replay-verified yet**. Crucible is built to show what was
+and wasn't established, not just a pass or fail.
+
 ## Badges for papers
 
 Every paper Crucible checks gets a status badge that links to its public record. Authors can paste one

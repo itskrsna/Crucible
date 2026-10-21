@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Crucible registry</title><style>:root{--bg:#fff;--fg:#1b1b1b;--muted:#666;--line:#ddd;--card:#f7f7f7}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--fg:#e8e8e8;--muted:#9a9a9a;--line:#333;--card:#1e1e1e}}
+body{margin:0 auto;max-width:860px;padding:24px 16px;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+a{color:inherit}h1{margin:0 0 4px}.muted{color:var(--muted)}
+table{border-collapse:collapse;width:100%;margin:16px 0}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}.stat{background:var(--card);padding:12px 16px;border-radius:8px}
+.stat b{display:block;font-size:24px}.note{background:var(--card);padding:12px 16px;border-radius:8px;margin:16px 0}
+code{font-size:13px;word-break:break-all}pre{overflow-x:auto;background:var(--card);padding:12px;border-radius:8px}</style></head><body>
+<h1>Crucible registry</h1><p class="muted">Open attempts to reproduce published results, each with its commands, limitations and full transcript.</p>
+<div class="stats">
+<div class="stat"><b>1</b>papers checked</div>
+<div class="stat"><b>1</b>reproduced</div>
+<div class="stat"><b>0</b>partially</div>
+<div class="stat"><b>0</b>not reproduced</div>
+<div class="stat"><b>0</b>could not run</div>
+</div>
+<p>Of 4 reproduced claims that had a baseline to compare against,
+<b>4</b> still beat the best baseline the paper itself reported.</p>
+<table><tr><th>Paper</th><th>Result</th></tr>
+<tr><td><a href="2610.25392.html">Paloma: Phase-Conditioned Residual Modulation for Time Series Forecasting</a><br><span class="muted">arXiv 2610.25392</span></td>
+<td><img src="badges/2610.25392.svg" alt="reproduced"></td></tr>
+</table><p class="note muted">crucible is an automated tool. A result of "not reproduced" or "could not run" can be caused by the
+agent, the sandbox or missing resources, not only by a problem in the paper, and says nothing about the authors' conduct.
+Every negative result is reviewed by a human before it is listed. Think a record is wrong?
+<a href="https://github.com/itskrsna/Crucible/issues/new?title=Dispute%3A+registry">Open a dispute</a>.</p></body></html>

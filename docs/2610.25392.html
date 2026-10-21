@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Paloma: Phase-Conditioned Residual Modulation for Time Series Forecasting — crucible</title><style>:root{--bg:#fff;--fg:#1b1b1b;--muted:#666;--line:#ddd;--card:#f7f7f7}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--fg:#e8e8e8;--muted:#9a9a9a;--line:#333;--card:#1e1e1e}}
+body{margin:0 auto;max-width:860px;padding:24px 16px;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+a{color:inherit}h1{margin:0 0 4px}.muted{color:var(--muted)}
+table{border-collapse:collapse;width:100%;margin:16px 0}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}.stat{background:var(--card);padding:12px 16px;border-radius:8px}
+.stat b{display:block;font-size:24px}.note{background:var(--card);padding:12px 16px;border-radius:8px;margin:16px 0}
+code{font-size:13px;word-break:break-all}pre{overflow-x:auto;background:var(--card);padding:12px;border-radius:8px}</style></head><body>
+<p><a href="index.html">← registry</a></p><h1>Paloma: Phase-Conditioned Residual Modulation for Time Series Forecasting</h1>
+<p class="muted">arXiv 2610.25392 · <a href="https://github.com/TSTS13/Paloma">code</a> @ <code>def3dfc612bd6554be8f2ed7d5174848d6a37119</code> · model <code>minimax/minimax-m3.1-flash:free</code></p>
+<p><img src="badges/2610.25392.svg" alt="reproduced"></p>
+<table><tr><th>Claim</th><th>Paper</th><th>Measured</th><th>Verdict</th></tr>
+<tr><td>MSE · ETTh1 horizon 96, lookback 336<br><span class="muted">tab:input_336_appendix</span></td>
+<td>0.355</td><td>0.3550</td>
+<td>reproduced<br><span class="muted">relative error 0.0%</span>
+<br><span class="muted">still beats the paper's reported baselines</span></td></tr><tr><td>MAE · ETTh1 horizon 96, lookback 336<br><span class="muted">tab:input_336_appendix</span></td>
+<td>0.38</td><td>0.3828</td>
+<td>reproduced<br><span class="muted">relative error 0.7%</span>
+<br><span class="muted">still beats the paper's reported baselines</span></td></tr><tr><td>MSE · ETTh1 horizon 96, lookback 720<br><span class="muted">tab:input_336_appendix</span></td>
+<td>0.359</td><td>0.3658</td>
+<td>reproduced<br><span class="muted">relative error 1.9%</span>
+<br><span class="muted">still beats the paper's reported baselines</span></td></tr><tr><td>MAE · ETTh1 horizon 96, lookback 720<br><span class="muted">tab:input_336_appendix</span></td>
+<td>0.389</td><td>0.3944</td>
+<td>reproduced<br><span class="muted">relative error 1.4%</span>
+<br><span class="muted">still beats the paper's reported baselines</span></td></tr>
+</table>
+
+<h2>Limitations</h2><ul><li>Scope: four numbers only (MSE and MAE on ETTh1, horizon 96, with lookback 336 and 720). This is not a check of the whole paper.</li><li>Single run per setting on CPU with the repository&#39;s default seed (2024) and the paper&#39;s 30 epochs. No variance estimate, so small differences are within normal run-to-run noise.</li><li>Measured values are 0.0% to 1.9% from the claimed ones; &#39;reproduced&#39; means within 2%.</li><li>The baselines used for &#39;still beats the paper&#39;s reported baselines&#39; are the numbers printed in the paper, not re-run by Crucible.</li><li>The run was driven by an automated agent using a free open model (minimax/minimax-m3.1-flash:free). It did not edit the authors&#39; model or evaluation code, but its final commands add two inline compatibility shims: np.Inf = np.inf (NumPy 2) and forcing torch.load to map_location=cpu.</li><li>Not replay-verified: the recorded Dockerfile contains only setup steps (clone, data download) and not the training, so &#39;crucible rerun&#39; cannot yet reproduce these numbers from a fresh container. A replayable re-run is planned.</li></ul>
+<h2>Replay</h2>
+<p class="note"><b>Not replay-verified.</b> The commands and Dockerfile are published for inspection, but this record has not yet been
+reproduced from a fresh container with <code>crucible rerun</code>, so treat the result as unconfirmed by replay.</p>
+<p class="note muted">crucible is an automated tool. A result of "not reproduced" or "could not run" can be caused by the
+agent, the sandbox or missing resources, not only by a problem in the paper, and says nothing about the authors' conduct.
+Every negative result is reviewed by a human before it is listed. Think a record is wrong?
+<a href="https://github.com/itskrsna/Crucible/issues/new?title=Dispute%3A+2610.25392">Open a dispute</a>.</p></body></html>

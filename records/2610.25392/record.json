@@ -1,0 +1,92 @@
+{
+  "schema_version": "0.1",
+  "paper": {
+    "arxiv_id": "2610.25392",
+    "title": "Paloma: Phase-Conditioned Residual Modulation for Time Series Forecasting",
+    "repo_url": "https://github.com/TSTS13/Paloma",
+    "repo_commit": "def3dfc612bd6554be8f2ed7d5174848d6a37119"
+  },
+  "results": [
+    {
+      "claim": {
+        "id": "c1",
+        "metric": "MSE",
+        "dataset": "ETTh1",
+        "setting": "horizon 96, lookback 336",
+        "value": 0.355,
+        "source": "tab:input_336_appendix",
+        "best_baseline": 0.362
+      },
+      "verdict": "reproduced",
+      "measured": 0.35497987270355225,
+      "command": "cd /work/repo \u0026\u0026 set -o pipefail \u0026\u0026 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 python -u -c 'import numpy as np, torch, runpy; np.Inf=np.inf; _load=torch.load; torch.load=lambda *a,**k: _load(*a, **{**k,\"map_location\":\"cpu\"}); runpy.run_path(\"run.py\", run_name=\"__main__\")' --is_training 0 --root_path /work/dataset/ETT-small --data_path ETTh1.csv --model_id ETTh1_336_96_bs32_lr0.0005 --model Paloma --data ETTh1 --features M --target OT --seq_len 336 --label_len 0 --pred_len 96 --e_layers 2 --d_layers 1 --factor 3 --enc_in 7 --cycle 24 --d_model 256 --dropout 0.5 --train_epochs 30 --batch_size 32 --patience 5 --gpu 0 --learning_rate 0.0005 --lossfun_alpha 0.5 --loss_mode L1 --itr 1 2\u003e\u00261 | grep -E '^mse:'",
+      "pattern": "mse:([0-9.]+)",
+      "note": "relative error 0.0%",
+      "beats_baselines": true
+    },
+    {
+      "claim": {
+        "id": "c2",
+        "metric": "MAE",
+        "dataset": "ETTh1",
+        "setting": "horizon 96, lookback 336",
+        "value": 0.38,
+        "source": "tab:input_336_appendix",
+        "best_baseline": 0.388
+      },
+      "verdict": "reproduced",
+      "measured": 0.3827742636203766,
+      "command": "cd /work/repo \u0026\u0026 set -o pipefail \u0026\u0026 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 python -u -c 'import numpy as np, torch, runpy; np.Inf=np.inf; _load=torch.load; torch.load=lambda *a,**k: _load(*a, **{**k,\"map_location\":\"cpu\"}); runpy.run_path(\"run.py\", run_name=\"__main__\")' --is_training 0 --root_path /work/dataset/ETT-small --data_path ETTh1.csv --model_id ETTh1_336_96_bs32_lr0.0005 --model Paloma --data ETTh1 --features M --target OT --seq_len 336 --label_len 0 --pred_len 96 --e_layers 2 --d_layers 1 --factor 3 --enc_in 7 --cycle 24 --d_model 256 --dropout 0.5 --train_epochs 30 --batch_size 32 --patience 5 --gpu 0 --learning_rate 0.0005 --lossfun_alpha 0.5 --loss_mode L1 --itr 1 2\u003e\u00261 | grep -E '^mse:'",
+      "pattern": "mae:([0-9.]+)",
+      "note": "relative error 0.7%",
+      "beats_baselines": true
+    },
+    {
+      "claim": {
+        "id": "c3",
+        "metric": "MSE",
+        "dataset": "ETTh1",
+        "setting": "horizon 96, lookback 720",
+        "value": 0.359,
+        "source": "tab:input_336_appendix",
+        "best_baseline": 0.368
+      },
+      "verdict": "reproduced",
+      "measured": 0.3657681345939636,
+      "command": "cd /work/repo \u0026\u0026 set -o pipefail \u0026\u0026 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 python -u -c 'import numpy as np, torch, runpy; np.Inf=np.inf; _load=torch.load; torch.load=lambda *a,**k: _load(*a, **{**k,\"map_location\":\"cpu\"}); runpy.run_path(\"run.py\", run_name=\"__main__\")' --is_training 0 --root_path /work/dataset/ETT-small --data_path ETTh1.csv --model_id ETTh1_720_96_bs32_lr0.0005 --model Paloma --data ETTh1 --features M --target OT --seq_len 720 --label_len 0 --pred_len 96 --e_layers 2 --d_layers 1 --factor 3 --enc_in 7 --cycle 24 --d_model 256 --dropout 0.5 --train_epochs 30 --batch_size 32 --patience 5 --gpu 0 --learning_rate 0.0005 --lossfun_alpha 0.5 --loss_mode L1 --itr 1 2\u003e\u00261 | grep -E '^mse:'",
+      "pattern": "mse:([0-9.]+)",
+      "note": "relative error 1.9%",
+      "beats_baselines": true
+    },
+    {
+      "claim": {
+        "id": "c4",
+        "metric": "MAE",
+        "dataset": "ETTh1",
+        "setting": "horizon 96, lookback 720",
+        "value": 0.389,
+        "source": "tab:input_336_appendix",
+        "best_baseline": 0.4
+      },
+      "verdict": "reproduced",
+      "measured": 0.39438551664352417,
+      "command": "cd /work/repo \u0026\u0026 set -o pipefail \u0026\u0026 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 python -u -c 'import numpy as np, torch, runpy; np.Inf=np.inf; _load=torch.load; torch.load=lambda *a,**k: _load(*a, **{**k,\"map_location\":\"cpu\"}); runpy.run_path(\"run.py\", run_name=\"__main__\")' --is_training 0 --root_path /work/dataset/ETT-small --data_path ETTh1.csv --model_id ETTh1_720_96_bs32_lr0.0005 --model Paloma --data ETTh1 --features M --target OT --seq_len 720 --label_len 0 --pred_len 96 --e_layers 2 --d_layers 1 --factor 3 --enc_in 7 --cycle 24 --d_model 256 --dropout 0.5 --train_epochs 30 --batch_size 32 --patience 5 --gpu 0 --learning_rate 0.0005 --lossfun_alpha 0.5 --loss_mode L1 --itr 1 2\u003e\u00261 | grep -E '^mse:'",
+      "pattern": "mae:([0-9.]+)",
+      "note": "relative error 1.4%",
+      "beats_baselines": true
+    }
+  ],
+  "dockerfile": "FROM crucible-base:py311\nWORKDIR /work\nRUN [\"bash\",\"-lc\",\"rm -rf /work/repo \u0026\u0026 git clone https://github.com/TSTS13/Paloma.git /work/repo \u0026\u0026 cd /work/repo \u0026\u0026 git checkout def3dfc612bd6554be8f2ed7d5174848d6a37119\"]\nRUN [\"bash\",\"-lc\",\"mkdir -p /work/dataset/ETT-small \u0026\u0026 cd /work/dataset/ETT-small \u0026\u0026 curl -fL --retry 3 -o ETTh1.csv https://raw.githubusercontent.com/zhouhaoyi/ETDataset/main/ETT-small/ETTh1.csv \u0026\u0026 python - \u003c\u003c'PY'\\nimport pandas as pd\\np='/work/dataset/ETT-small/ETTh1.csv'\\ndf=pd.read_csv(p)\\nprint('shape:', df.shape)\\nprint('columns:', list(df.columns))\\nprint('first date:', df['date'].iloc[0], 'last date:', df['date'].iloc[-1])\\nPY\\nsha256sum /work/dataset/ETT-small/ETTh1.csv\"]\nRUN [\"bash\",\"-lc\",\"mkdir -p /work/paper \u0026\u0026 cd /work/paper \u0026\u0026 (curl -fL --retry 2 -o source.tar.gz https://export.arxiv.org/e-print/2610.25392 || true) \u0026\u0026 (curl -fL --retry 2 -o paper.pdf https://arxiv.org/pdf/2610.25392 || true) \u0026\u0026 ls -lh /work/paper \u0026\u0026 file /work/paper/* 2\u003e/dev/null\"]\n",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "steps": 36,
+  "limitations": [
+    "Scope: four numbers only (MSE and MAE on ETTh1, horizon 96, with lookback 336 and 720). This is not a check of the whole paper.",
+    "Single run per setting on CPU with the repository's default seed (2024) and the paper's 30 epochs. No variance estimate, so small differences are within normal run-to-run noise.",
+    "Measured values are 0.0% to 1.9% from the claimed ones; 'reproduced' means within 2%.",
+    "The baselines used for 'still beats the paper's reported baselines' are the numbers printed in the paper, not re-run by Crucible.",
+    "The run was driven by an automated agent using a free open model (minimax/minimax-m3.1-flash:free). It did not edit the authors' model or evaluation code, but its final commands add two inline compatibility shims: np.Inf = np.inf (NumPy 2) and forcing torch.load to map_location=cpu.",
+    "Not replay-verified: the recorded Dockerfile contains only setup steps (clone, data download) and not the training, so 'crucible rerun' cannot yet reproduce these numbers from a fresh container. A replayable re-run is planned."
+  ],
+  "replay_verified": false,
+  "human_reviewed": false
+}
