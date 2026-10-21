@@ -1,0 +1,6 @@
+/crucible
+/crucible.exe
+.cache/
+.env
+.env.*
+!.env.example
